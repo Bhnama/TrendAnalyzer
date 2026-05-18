@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Commerce Retail Analytics & SQL Case Study - Coding Ninjas</title>
+  
+  <!-- Premium Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">C</div>
+      <div class="logo-text">
+        <h1>Bangalore Accessories Co.</h1>
+        <p>Omnichannel Retail Analytics</p>
+      </div>
+    </div>
+    <div class="cn-badge">
+      <span class="cn-dot"></span>
+      Coding Ninjas Case Study
+    </div>
+  </header>
+
+  <!-- Dashboard Content -->
+  <div class="dashboard-container">
+    
+    <!-- Banner -->
+    <div class="banner-glass">
+      <div class="banner-content">
+        <h2 class="banner-title">E-Commerce Company Case Study Solutions</h2>
+        <p class="banner-subtitle">
+          Analyzing 2023 retail transaction data across 14 countries, exploring order channels (App, Website, WhatsApp, Helpline), customer segmentations, and sales rep performance targets to unlock the SQL Module Mock Interview eligibility.
+        </p>
+        <div class="metadata-row">
+          <div class="meta-item">
+            <i data-lucide="database" class="meta-icon"></i>
+            <span>SQLite Mock DB</span>
+          </div>
+          <div class="meta-item">
+            <i data-lucide="globe" class="meta-icon"></i>
+            <span>14 Countries Covered</span>
+          </div>
+          <div class="meta-item">
+            <i data-lucide="award" class="meta-icon"></i>
+            <span>Mock Interview Prerequisite</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Metrics -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span>Global Sales Revenue</span>
+          <div class="kpi-icon"><i data-lucide="dollar-sign"></i></div>
+        </div>
+        <div class="kpi-value" id="kpi-sales">$1,944.50</div>
+        <div class="kpi-growth growth-up">
+          <i data-lucide="trending-up"></i>
+          <span>+24% vs Target</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span>Total Transactions</span>
+          <div class="kpi-icon"><i data-lucide="shopping-bag"></i></div>
+        </div>
+        <div class="kpi-value" id="kpi-orders">25 Orders</div>
+        <div class="kpi-growth growth-up">
+          <i data-lucide="trending-up"></i>
+          <span>+15% Growth MoM</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span>Average Order Value</span>
+          <div class="kpi-icon"><i data-lucide="calculator"></i></div>
+        </div>
+        <div class="kpi-value" id="kpi-aov">$77.78</div>
+        <div class="kpi-growth growth-up">
+          <i data-lucide="activity"></i>
+          <span>Healthy Basket Size</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span>Top Channel Contribution</span>
+          <div class="kpi-icon"><i data-lucide="smartphone"></i></div>
+        </div>
+        <div class="kpi-value" id="kpi-channel">App (40%)</div>
+        <div class="kpi-growth growth-up">
+          <i data-lucide="message-square"></i>
+          <span>WhatsApp Close Second</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workspace Column Grid -->
+    <div class="workspace-grid">
+      
+      <!-- Interactive SQL Console -->
+      <div class="card-panel">
+        <h3 class="panel-title">
+          <i data-lucide="terminal" class="panel-icon"></i>
+          Interactive SQL Playground
+        </h3>
+        
+        <div class="sql-selector-wrapper">
+          <select id="query-select" class="sql-select">
+            <option value="" disabled selected>-- Select a Case Study Problem --</option>
+            <option value="q1">Problem 1: Sales Performance by Country</option>
+            <option value="q2">Problem 2: Order Channel Performance (App vs Web vs WhatsApp vs Helpline)</option>
+            <option value="q3">Problem 3: Customer Segmentation (RFM Analysis)</option>
+            <option value="q4">Problem 4: Top 5 Most Profitable Products</option>
+            <option value="q5">Problem 5: Sales Reps Target Achievement Leaderboard</option>
+            <option value="q6">Problem 6: Month-on-Month Growth Rate (Top Regions)</option>
+            <option value="q7">Problem 7: First-Time vs Repeat Buyer Channel Preference</option>
+            <option value="q8">Problem 8: Underperforming Country Markets</option>
+          </select>
+        </div>
+
+        <div class="code-editor-container">
+          <div class="editor-header">
+            <div class="editor-actions">
+              <span class="editor-dot"></span>
+              <span class="editor-dot"></span>
+              <span class="editor-dot"></span>
+            </div>
+            <span>SQL EDITOR - query.sql</span>
+          </div>
+          <textarea class="sql-code-area" id="sql-editor" readonly placeholder="Select a case study problem above to load the SQL script..."></textarea>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-execute" id="btn-run">
+            <i data-lucide="play" style="width: 18px; height: 18px;"></i>
+            Execute SQL Query
+          </button>
+          <span class="query-time-badge" id="time-badge">Executed in 0.04ms</span>
+        </div>
+      </div>
+
+      <!-- Live Data Visualizations / Output Panel -->
+      <div class="card-panel visuals-panel">
+        <h3 class="panel-title">
+          <i data-lucide="bar-chart-3" class="panel-icon"></i>
+          Query Output & Visualization
+        </h3>
+        
+        <div class="results-panel">
+          <div class="results-header">
+            <span>Result Grid</span>
+            <span id="rows-count">0 rows returned</span>
+          </div>
+          <div class="results-table-container">
+            <table class="results-table" id="results-table">
+              <thead>
+                <!-- Populated by JS -->
+              </thead>
+              <tbody>
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+            <div class="empty-results" id="empty-state">
+              <i data-lucide="database-backup" class="empty-icon"></i>
+              <p>Execute a query in the playground to load and inspect results</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-container">
+          <canvas id="analytics-chart"></canvas>
+        </div>
+
+        <div class="insights-box">
+          <div class="insights-title">
+            <i data-lucide="lightbulb" style="width: 16px; height: 16px;"></i>
+            Business Insight & Actionable Strategy
+          </div>
+          <p class="insights-text" id="insight-text">
+            Choose a problem and run the query to see key recommendations for the Mobile Accessories Company.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Case Study Solutions Showcase Section -->
+    <div class="case-study-showcase">
+      <div class="showcase-header">
+        <h3 class="showcase-title">Fully Solved Case Study Queries</h3>
+        <p class="showcase-subtitle">Direct solutions, clean DDL schema script, and insights you can use immediately for your Python/SQL assignment.</p>
+      </div>
+
+      <!-- Problem 1 Card -->
+      <div class="problem-card">
+        <span class="problem-badge">PROBLEM 1</span>
+        <div class="problem-desc">Global Sales Performance & AOV by Country</div>
+        <div class="problem-detail">
+          Evaluate the total sales revenue, total number of orders, and average order value (AOV) across the 14 countries to identify where customer baskets are largest.
+        </div>
+        <div class="query-box">
+          <button class="btn-copy-code" onclick="copyQuery(1)">Copy SQL</button>
+          <pre id="code-p1">SELECT 
+    c.country,
+    COUNT(o.order_id) AS total_orders,
+    SUM(o.total_amount) AS total_revenue,
+    ROUND(AVG(o.total_amount), 2) AS average_order_value
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+GROUP BY c.country
+ORDER BY total_revenue DESC;</pre>
+        </div>
+        <div class="insights-badge">
+          <i data-lucide="check-circle" style="color: var(--accent-success); shrink: 0; width: 20px; height: 20px;"></i>
+          <span><strong>Case Study Insight:</strong> India represents our highest transaction volume, but developed countries like USA and UAE have standard baskets (AOV) that are 1.8x larger. Market screen protectors and cases in bundles to close the gap in Asian markets.</span>
+        </div>
+      </div>
+
+      <!-- Problem 2 Card -->
+      <div class="problem-card">
+        <span class="problem-badge">PROBLEM 2</span>
+        <div class="problem-desc">Omnichannel Performance (App, Web, WhatsApp, Helpline)</div>
+        <div class="problem-detail">
+          Analyze which channels perform best to check if social channels like WhatsApp generate substantial business.
+        </div>
+        <div class="query-box">
+          <button class="btn-copy-code" onclick="copyQuery(2)">Copy SQL</button>
+          <pre id="code-p2">SELECT 
+    order_method,
+    COUNT(order_id) AS order_count,
+    SUM(total_amount) AS total_revenue,
+    ROUND(SUM(total_amount) * 100.0 / (SELECT SUM(total_amount) FROM orders), 2) AS revenue_percentage
+FROM orders
+GROUP BY order_method
+ORDER BY total_revenue DESC;</pre>
+        </div>
+        <div class="insights-badge">
+          <i data-lucide="check-circle" style="color: var(--accent-success); shrink: 0; width: 20px; height: 20px;"></i>
+          <span><strong>Case Study Insight:</strong> Mobile App sales and WhatsApp messaging channels drive over 73% of total revenue. Integrating direct catalog purchase links inside WhatsApp can further automate checkout without needing a live agent.</span>
+        </div>
+      </div>
+
+      <!-- Problem 3 Card -->
+      <div class="problem-card">
+        <span class="problem-badge">PROBLEM 3</span>
+        <div class="problem-desc">Customer Segmentation (RFM Analytics)</div>
+        <div class="problem-detail">
+          Group customers into VIP/Loyal, Active Regular, New, or At Risk segments based on their ordering frequencies and order value metrics.
+        </div>
+        <div class="query-box">
+          <button class="btn-copy-code" onclick="copyQuery(3)">Copy SQL</button>
+          <pre id="code-p3">SELECT 
+    c.customer_name,
+    c.country,
+    COUNT(o.order_id) AS frequency,
+    SUM(o.total_amount) AS monetary_value,
+    CASE 
+        WHEN COUNT(o.order_id) >= 3 AND SUM(o.total_amount) >= 150 THEN 'VIP Loyal'
+        WHEN COUNT(o.order_id) >= 2 AND SUM(o.total_amount) >= 50 THEN 'Active Regular'
+        WHEN COUNT(o.order_id) = 1 THEN 'New Buyer'
+        ELSE 'Churn Risk'
+    END AS customer_segment
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.customer_name, c.country
+ORDER BY monetary_value DESC;</pre>
+        </div>
+        <div class="insights-badge">
+          <i data-lucide="check-circle" style="color: var(--accent-success); shrink: 0; width: 20px; height: 20px;"></i>
+          <span><strong>Case Study Insight:</strong> VIPs compose 15% of our base but contribute 48% of total revenue. Build targeted marketing automations to reward active regulars with exclusive MagSafe bundle releases.</span>
+        </div>
+      </div>
+
+      <!-- Problem 4 Card -->
+      <div class="problem-card">
+        <span class="problem-badge">PROBLEM 4</span>
+        <div class="problem-desc">Top 5 Most Profitable Mobile Accessories</div>
+        <div class="problem-detail">
+          Measure the gross profit margin of each accessory (Price - Cost) multiplied by volume sold to prioritize inventory procurement.
+        </div>
+        <div class="query-box">
+          <button class="btn-copy-code" onclick="copyQuery(4)">Copy SQL</button>
+          <pre id="code-p4">SELECT 
+    p.product_name,
+    p.category,
+    SUM(oi.quantity) AS units_sold,
+    SUM(oi.quantity * (p.price - p.cost)) AS gross_profit,
+    ROUND((p.price - p.cost) * 100.0 / p.price, 2) AS margin_percentage
+FROM order_items oi
+JOIN products p ON oi.product_id = p.product_id
+GROUP BY p.product_id, p.product_name, p.category
+ORDER BY gross_profit DESC
+LIMIT 5;</pre>
+        </div>
+        <div class="insights-badge">
+          <i data-lucide="check-circle" style="color: var(--accent-success); shrink: 0; width: 20px; height: 20px;"></i>
+          <span><strong>Case Study Insight:</strong> Wireless Earbuds and chargers represent high margin categories (68%). Maintain 30% safety margins in stocks to prevent stockouts of premium sound accessories.</span>
+        </div>
+      </div>
+
+      <!-- Problem 5 Card -->
+      <div class="problem-card">
+        <span class="problem-badge">PROBLEM 5</span>
+        <div class="problem-desc">Sales Representative Performance vs Target</div>
+        <div class="problem-detail">
+          Compare total sales conversion achieved by regional sales leads against their allocated quarterly commission targets.
+        </div>
+        <div class="query-box">
+          <button class="btn-copy-code" onclick="copyQuery(5)">Copy SQL</button>
+          <pre id="code-p5">SELECT 
+    sr.rep_name,
+    sr.region,
+    sr.target_sales,
+    COALESCE(SUM(o.total_amount), 0) AS actual_sales,
+    ROUND(COALESCE(SUM(o.total_amount), 0) * 100.0 / sr.target_sales, 2) AS performance_pct
+FROM sales_reps sr
+LEFT JOIN orders o ON sr.sales_rep_id = o.sales_rep_id
+GROUP BY sr.sales_rep_id, sr.rep_name, sr.region, sr.target_sales
+ORDER BY performance_pct DESC;</pre>
+        </div>
+        <div class="insights-badge">
+          <i data-lucide="check-circle" style="color: var(--accent-success); shrink: 0; width: 20px; height: 20px;"></i>
+          <span><strong>Case Study Insight:</strong> Domestic region (Karan Verma) is converting at a solid pace, but target parameters in high monetary regions like the Americas (Jessica Taylor) need optimized helpline staffing.</span>
+        </div>
+      </div>
+
+      <!-- Problem 6 Card -->
+      <div class="problem-card">
+        <span class="problem-badge">PROBLEM 6</span>
+        <div class="problem-desc">Month-on-Month Revenue Trends</div>
+        <div class="problem-detail">
+          Calculate the month-on-month revenue trends using SQL window functions (`LAG`) to capture seasonal purchase growth.
+        </div>
+        <div class="query-box">
+          <button class="btn-copy-code" onclick="copyQuery(6)">Copy SQL</button>
+          <pre id="code-p6">WITH MonthlyRevenue AS (
+    SELECT 
+        STRFTIME('%Y-%m', order_date) AS order_month,
+        SUM(total_amount) AS revenue
+    FROM orders
+    GROUP BY order_month
+)
+SELECT 
+    order_month,
+    revenue,
+    LAG(revenue, 1) OVER (ORDER BY order_month) AS prev_month_revenue,
+    ROUND(
+        (revenue - LAG(revenue, 1) OVER (ORDER BY order_month)) * 100.0 / 
+        LAG(revenue, 1) OVER (ORDER BY order_month), 
+        2
+    ) AS mom_growth_percentage
+FROM MonthlyRevenue;</pre>
+        </div>
+        <div class="insights-badge">
+          <i data-lucide="check-circle" style="color: var(--accent-success); shrink: 0; width: 20px; height: 20px;"></i>
+          <span><strong>Case Study Insight:</strong> A major revenue spike occurs in May (130%) coinciding with the release of premium tempered glass screens, followed by steady sales in summer. Plan product launches strategically in high-growth seasons.</span>
+        </div>
+      </div>
+
+      <!-- Problem 7 Card -->
+      <div class="problem-card">
+        <span class="problem-badge">PROBLEM 7</span>
+        <div class="problem-desc">First-Time vs Repeat Buyer Channel Preference</div>
+        <div class="problem-detail">
+          Determine if new customers prefer web checkouts while repeat customers adopt the app and WhatsApp channels.
+        </div>
+        <div class="query-box">
+          <button class="btn-copy-code" onclick="copyQuery(7)">Copy SQL</button>
+          <pre id="code-p7">WITH CustomerOrders AS (
+    SELECT 
+        customer_id,
+        order_method,
+        ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY order_date) AS order_sequence
+    FROM orders
+)
+SELECT 
+    order_method,
+    SUM(CASE WHEN order_sequence = 1 THEN 1 ELSE 0 END) AS first_time_purchases,
+    SUM(CASE WHEN order_sequence > 1 THEN 1 ELSE 0 END) AS repeat_purchases
+FROM CustomerOrders
+GROUP BY order_method
+ORDER BY repeat_purchases DESC;</pre>
+        </div>
+        <div class="insights-badge">
+          <i data-lucide="check-circle" style="color: var(--accent-success); shrink: 0; width: 20px; height: 20px;"></i>
+          <span><strong>Case Study Insight:</strong> First-time buyers show heavy reliance on official web storefronts for authority trust, whereas repeat orders occur frictionlessly through WhatsApp chat triggers.</span>
+        </div>
+      </div>
+
+      <!-- Problem 8 Card -->
+      <div class="problem-card">
+        <span class="problem-badge">PROBLEM 8</span>
+        <div class="problem-desc">Underperforming Country Markets</div>
+        <div class="problem-detail">
+          Identify target country zones generating below-average global transaction levels to channel corrective marketing.
+        </div>
+        <div class="query-box">
+          <button class="btn-copy-code" onclick="copyQuery(8)">Copy SQL</button>
+          <pre id="code-p8">SELECT 
+    c.country,
+    COUNT(o.order_id) AS sales_volume,
+    SUM(o.total_amount) AS revenue
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.country
+HAVING SUM(o.total_amount) < (
+    SELECT AVG(revenue_per_country) 
+    FROM (
+        SELECT SUM(o2.total_amount) AS revenue_per_country 
+        FROM orders o2 
+        JOIN customers c2 ON o2.customer_id = c2.customer_id 
+        GROUP BY c2.country
+    )
+)
+ORDER BY revenue ASC;</pre>
+        </div>
+        <div class="insights-badge">
+          <i data-lucide="check-circle" style="color: var(--accent-success); shrink: 0; width: 20px; height: 20px;"></i>
+          <span><strong>Case Study Insight:</strong> Brazil and South Africa represent underperforming markets. Re-targeting with localized payment checkouts and free custom packaging will increase engagement volume.</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Download CTA Section -->
+    <div class="download-cta-section">
+      <button class="btn-download-all" id="btn-download-script">
+        <i data-lucide="download-cloud" style="width: 24px; height: 24px;"></i>
+        Download Complete SQL Solutions Script
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Toast/Notification -->
+  <div class="toast" id="toast-indicator">
+    <i data-lucide="check-circle" style="color: var(--accent-success);"></i>
+    <span id="toast-message">Copied query text to clipboard!</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
