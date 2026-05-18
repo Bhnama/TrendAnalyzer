@@ -29,20 +29,20 @@ Below is the database architecture modeling the 14-country omnichannel transacti
 erDiagram
     CUSTOMERS ||--o{ ORDERS : places
     SALES_REPS ||--o{ ORDERS : assists
-    ORDERS ||--|{ ORDER_ITEMS : contains
-    PRODUCTS ||--o{ ORDER_ITEMS : ordered
+    ORDERS ||--|{ ORDER_DETAILS : contains
+    PRODUCTS ||--o{ ORDER_DETAILS : ordered
     
     CUSTOMERS {
         int customer_id PK
-        string customer_name
+        string name
         string email
-        string country
+        string location
         date registration_date
         string device_type
     }
     PRODUCTS {
         int product_id PK
-        string product_name
+        string name
         string category
         decimal price
         decimal cost
@@ -62,12 +62,11 @@ erDiagram
         int sales_rep_id FK
         decimal total_amount
     }
-    ORDER_ITEMS {
-        int order_item_id PK
-        int order_id FK
-        int product_id FK
+    ORDER_DETAILS {
+        int order_id PK, FK
+        int product_id PK, FK
         int quantity
-        decimal unit_price
+        decimal price_per_unit
     }
 ```
 

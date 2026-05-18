@@ -4,20 +4,49 @@ let currentChart = null;
 // Initialize Lucide Icons on DOM load
 document.addEventListener("DOMContentLoaded", () => {
   lucide.createIcons();
+  updateDynamicKPIs();
   initDashboardEvents();
   initDefaultChart();
 });
 
-// Map of pre-written SQL statements
+// Calculate and render KPIs dynamically based on actual database size
+function updateDynamicKPIs() {
+  const totalRevenue = DATABASE.orders.reduce((sum, o) => sum + o.total_amount, 0);
+  const totalOrders = DATABASE.orders.length;
+  const aov = totalRevenue / totalOrders;
+  
+  // Calculate top channel
+  const channelMap = {};
+  DATABASE.orders.forEach(o => {
+    channelMap[o.order_method] = (channelMap[o.order_method] || 0) + o.total_amount;
+  });
+  let topChannel = "";
+  let topRevenue = 0;
+  Object.keys(channelMap).forEach(ch => {
+    if (channelMap[ch] > topRevenue) {
+      topRevenue = channelMap[ch];
+      topChannel = ch;
+    }
+  });
+  const topPct = ((topRevenue / totalRevenue) * 100).toFixed(0);
+
+  document.getElementById("kpi-sales").textContent = "$" + totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  document.getElementById("kpi-orders").textContent = `${totalOrders} Orders`;
+  document.getElementById("kpi-aov").textContent = "$" + aov.toFixed(2);
+  document.getElementById("kpi-channel").textContent = `${topChannel} (${topPct}%)`;
+}
+
+
+// Map of pre-written SQL statements - PERFECTLY ALIGNED with Coding Ninjas Case Study DDL/DML
 const SQL_SCRIPTS = {
   q1: `SELECT 
-    c.country,
+    c.location AS country,
     COUNT(o.order_id) AS total_orders,
     SUM(o.total_amount) AS total_revenue,
     ROUND(AVG(o.total_amount), 2) AS average_order_value
 FROM orders o
 JOIN customers c ON o.customer_id = c.customer_id
-GROUP BY c.country
+GROUP BY c.location
 ORDER BY total_revenue DESC;`,
   
   q2: `SELECT 
@@ -30,8 +59,8 @@ GROUP BY order_method
 ORDER BY total_revenue DESC;`,
 
   q3: `SELECT 
-    c.customer_name,
-    c.country,
+    c.name AS customer_name,
+    c.location AS country,
     COUNT(o.order_id) AS frequency,
     SUM(o.total_amount) AS monetary_value,
     CASE 
@@ -42,18 +71,18 @@ ORDER BY total_revenue DESC;`,
     END AS customer_segment
 FROM customers c
 LEFT JOIN orders o ON c.customer_id = o.customer_id
-GROUP BY c.customer_id, c.customer_name, c.country
+GROUP BY c.customer_id, c.name, c.location
 ORDER BY monetary_value DESC;`,
 
   q4: `SELECT 
-    p.product_name,
+    p.name AS product_name,
     p.category,
-    SUM(oi.quantity) AS units_sold,
-    SUM(oi.quantity * (p.price - p.cost)) AS gross_profit,
+    SUM(od.quantity) AS units_sold,
+    SUM(od.quantity * (p.price - p.cost)) AS gross_profit,
     ROUND((p.price - p.cost) * 100.0 / p.price, 2) AS margin_percentage
-FROM order_items oi
-JOIN products p ON oi.product_id = p.product_id
-GROUP BY p.product_id, p.product_name, p.category
+FROM order_details od
+JOIN products p ON od.product_id = p.product_id
+GROUP BY p.product_id, p.name, p.category
 ORDER BY gross_profit DESC
 LIMIT 5;`,
 
@@ -102,19 +131,19 @@ GROUP BY order_method
 ORDER BY repeat_purchases DESC;`,
 
   q8: `SELECT 
-    c.country,
+    c.location AS country,
     COUNT(o.order_id) AS sales_volume,
     SUM(o.total_amount) AS revenue
 FROM customers c
 LEFT JOIN orders o ON c.customer_id = o.customer_id
-GROUP BY c.country
+GROUP BY c.location
 HAVING SUM(o.total_amount) < (
     SELECT AVG(revenue_per_country) 
     FROM (
         SELECT SUM(o2.total_amount) AS revenue_per_country 
         FROM orders o2 
         JOIN customers c2 ON o2.customer_id = c2.customer_id 
-        GROUP BY c2.country
+        GROUP BY c2.location
     )
 )
 ORDER BY revenue ASC;`
@@ -139,11 +168,11 @@ const MOCK_SQL_ENGINE = {
     DATABASE.orders.forEach(order => {
       const cust = DATABASE.customers.find(c => c.customer_id === order.customer_id);
       if (cust) {
-        if (!countryMap[cust.country]) {
-          countryMap[cust.country] = { country: cust.country, total_orders: 0, total_revenue: 0 };
+        if (!countryMap[cust.location]) {
+          countryMap[cust.location] = { country: cust.location, total_orders: 0, total_revenue: 0 };
         }
-        countryMap[cust.country].total_orders += 1;
-        countryMap[cust.country].total_revenue += order.total_amount;
+        countryMap[cust.location].total_orders += 1;
+        countryMap[cust.location].total_revenue += order.total_amount;
       }
     });
     return Object.values(countryMap)
@@ -191,8 +220,8 @@ const MOCK_SQL_ENGINE = {
         segment = "Churn Risk";
       }
       return {
-        customer_name: cust.customer_name,
-        country: cust.country,
+        customer_name: cust.name,
+        country: cust.location,
         frequency: freq,
         monetary_value: "$" + totalAmount.toFixed(2),
         customer_segment: segment
@@ -202,11 +231,11 @@ const MOCK_SQL_ENGINE = {
 
   q4: () => {
     const prodMap = {};
-    DATABASE.order_items.forEach(item => {
+    DATABASE.order_details.forEach(item => {
       const prod = DATABASE.products.find(p => p.product_id === item.product_id);
       if (prod) {
         if (!prodMap[prod.product_id]) {
-          prodMap[prod.product_id] = { name: prod.product_name, cat: prod.category, qty: 0, profit: 0, price: prod.price, cost: prod.cost };
+          prodMap[prod.product_id] = { name: prod.name, cat: prod.category, qty: 0, profit: 0, price: prod.price, cost: prod.cost };
         }
         prodMap[prod.product_id].qty += item.quantity;
         prodMap[prod.product_id].profit += item.quantity * (prod.price - prod.cost);
@@ -296,18 +325,18 @@ const MOCK_SQL_ENGINE = {
     DATABASE.orders.forEach(order => {
       const cust = DATABASE.customers.find(c => c.customer_id === order.customer_id);
       if (cust) {
-        if (!countryMap[cust.country]) {
-          countryMap[cust.country] = { country: cust.country, sales_volume: 0, revenue: 0 };
+        if (!countryMap[cust.location]) {
+          countryMap[cust.location] = { country: cust.location, sales_volume: 0, revenue: 0 };
         }
-        countryMap[cust.country].sales_volume += 1;
-        countryMap[cust.country].revenue += order.total_amount;
+        countryMap[cust.location].sales_volume += 1;
+        countryMap[cust.location].revenue += order.total_amount;
       }
     });
     
     // Also include countries with 0 sales
     DATABASE.customers.forEach(cust => {
-      if (!countryMap[cust.country]) {
-        countryMap[cust.country] = { country: cust.country, sales_volume: 0, revenue: 0 };
+      if (!countryMap[cust.location]) {
+        countryMap[cust.location] = { country: cust.location, sales_volume: 0, revenue: 0 };
       }
     });
 
@@ -711,16 +740,16 @@ function downloadSQLSolutions() {
   sqlText += `-- 1. DATABASE SCHEMA CREATION (DDL)\n`;
   sqlText += `CREATE TABLE customers (
     customer_id INT PRIMARY KEY,
-    customer_name VARCHAR(100),
+    name VARCHAR(100),
     email VARCHAR(100),
-    country VARCHAR(50),
+    location VARCHAR(50),
     registration_date DATE,
     device_type VARCHAR(20)
 );\n\n`;
 
   sqlText += `CREATE TABLE products (
     product_id INT PRIMARY KEY,
-    product_name VARCHAR(100),
+    name VARCHAR(100),
     category VARCHAR(50),
     price DECIMAL(10, 2),
     cost DECIMAL(10, 2),
@@ -745,12 +774,12 @@ function downloadSQLSolutions() {
     FOREIGN KEY (sales_rep_id) REFERENCES sales_reps(sales_rep_id)
 );\n\n`;
 
-  sqlText += `CREATE TABLE order_items (
-    order_item_id INT PRIMARY KEY AUTOINCREMENT,
+  sqlText += `CREATE TABLE order_details (
     order_id INT,
     product_id INT,
     quantity INT,
-    unit_price DECIMAL(10, 2),
+    price_per_unit DECIMAL(10, 2),
+    PRIMARY KEY (order_id, product_id),
     FOREIGN KEY (order_id) REFERENCES orders(order_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id)
 );\n\n\n`;

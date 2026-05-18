@@ -213,18 +213,18 @@
         <span class="problem-badge">PROBLEM 1</span>
         <div class="problem-desc">Global Sales Performance & AOV by Country</div>
         <div class="problem-detail">
-          Evaluate the total sales revenue, total number of orders, and average order value (AOV) across the 14 countries to identify where customer baskets are largest.
+          Evaluate the total sales revenue, total number of orders, and average order value (AOV) across the 14 countries (mapped from location) to identify where customer baskets are largest.
         </div>
         <div class="query-box">
           <button class="btn-copy-code" onclick="copyQuery(1)">Copy SQL</button>
           <pre id="code-p1">SELECT 
-    c.country,
+    c.location AS country,
     COUNT(o.order_id) AS total_orders,
     SUM(o.total_amount) AS total_revenue,
     ROUND(AVG(o.total_amount), 2) AS average_order_value
 FROM orders o
 JOIN customers c ON o.customer_id = c.customer_id
-GROUP BY c.country
+GROUP BY c.location
 ORDER BY total_revenue DESC;</pre>
         </div>
         <div class="insights-badge">
@@ -267,8 +267,8 @@ ORDER BY total_revenue DESC;</pre>
         <div class="query-box">
           <button class="btn-copy-code" onclick="copyQuery(3)">Copy SQL</button>
           <pre id="code-p3">SELECT 
-    c.customer_name,
-    c.country,
+    c.name AS customer_name,
+    c.location AS country,
     COUNT(o.order_id) AS frequency,
     SUM(o.total_amount) AS monetary_value,
     CASE 
@@ -279,7 +279,7 @@ ORDER BY total_revenue DESC;</pre>
     END AS customer_segment
 FROM customers c
 LEFT JOIN orders o ON c.customer_id = o.customer_id
-GROUP BY c.customer_id, c.customer_name, c.country
+GROUP BY c.customer_id, c.name, c.location
 ORDER BY monetary_value DESC;</pre>
         </div>
         <div class="insights-badge">
@@ -298,14 +298,14 @@ ORDER BY monetary_value DESC;</pre>
         <div class="query-box">
           <button class="btn-copy-code" onclick="copyQuery(4)">Copy SQL</button>
           <pre id="code-p4">SELECT 
-    p.product_name,
+    p.name AS product_name,
     p.category,
-    SUM(oi.quantity) AS units_sold,
-    SUM(oi.quantity * (p.price - p.cost)) AS gross_profit,
+    SUM(od.quantity) AS units_sold,
+    SUM(od.quantity * (p.price - p.cost)) AS gross_profit,
     ROUND((p.price - p.cost) * 100.0 / p.price, 2) AS margin_percentage
-FROM order_items oi
-JOIN products p ON oi.product_id = p.product_id
-GROUP BY p.product_id, p.product_name, p.category
+FROM order_details od
+JOIN products p ON od.product_id = p.product_id
+GROUP BY p.product_id, p.name, p.category
 ORDER BY gross_profit DESC
 LIMIT 5;</pre>
         </div>
@@ -414,19 +414,19 @@ ORDER BY repeat_purchases DESC;</pre>
         <div class="query-box">
           <button class="btn-copy-code" onclick="copyQuery(8)">Copy SQL</button>
           <pre id="code-p8">SELECT 
-    c.country,
+    c.location AS country,
     COUNT(o.order_id) AS sales_volume,
     SUM(o.total_amount) AS revenue
 FROM customers c
 LEFT JOIN orders o ON c.customer_id = o.customer_id
-GROUP BY c.country
+GROUP BY c.location
 HAVING SUM(o.total_amount) < (
     SELECT AVG(revenue_per_country) 
     FROM (
         SELECT SUM(o2.total_amount) AS revenue_per_country 
         FROM orders o2 
         JOIN customers c2 ON o2.customer_id = c2.customer_id 
-        GROUP BY c2.country
+        GROUP BY c2.location
     )
 )
 ORDER BY revenue ASC;</pre>
