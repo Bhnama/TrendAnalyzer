@@ -247,7 +247,7 @@ elif page == "📊 Sales Analytics":
             title="30-Day Revenue Trend",
             labels={"x": "Date", "y": "Revenue ($)"}
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     
     with tab2:
         product_sales = sales_df.groupby('Product')['Units_Sold'].sum().sort_values(ascending=False)
@@ -258,7 +258,7 @@ elif page == "📊 Sales Analytics":
             title="Units Sold by Product",
             labels={"x": "Units Sold", "y": "Product"}
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
     
     with tab3:
         product_category = products_df.merge(sales_df, on='Product')
@@ -268,7 +268,7 @@ elif page == "📊 Sales Analytics":
             names=category_sales.index,
             title="Sales Distribution by Category"
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
 # ============== SENTIMENT ANALYSIS ==============
 elif page == "💬 Sentiment Analysis":
@@ -310,7 +310,7 @@ elif page == "💬 Sentiment Analysis":
         title="Sentiment Distribution",
         labels={"x": "Sentiment", "count": "Count"}
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 # ============== PRICE PREDICTION ==============
 elif page == "🔮 Price Prediction":
@@ -353,7 +353,7 @@ elif page == "🔮 Price Prediction":
         title="Price Optimization Scenario",
         labels={"x": "Time Period", "y": "Price ($)"}
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 # ============== DEMAND FORECAST ==============
 elif page == "📈 Demand Forecast":
@@ -389,7 +389,7 @@ elif page == "📈 Demand Forecast":
         labels={"Demand": "Units", "Day": "Day"},
         color_discrete_map={'Historical': '#667eea', 'Forecast': '#764ba2'}
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
     
     st.markdown(f"**Avg Forecasted Demand:** {forecast.mean():.0f} units/day")
 
