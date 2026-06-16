@@ -2,8 +2,22 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from pathlib import Path
-import pickle
 from datetime import datetime, timedelta
+import os
+from db_utils import (
+    load_products,
+    load_customers,
+    load_sales,
+    load_reviews,
+    save_products,
+    save_customers,
+    save_sales,
+    save_reviews,
+    save_order,
+    load_orders,
+    init_db
+)
+from data_utils import DataGenerator
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.decomposition import PCA
@@ -24,8 +38,13 @@ st.set_page_config(
 st.markdown("""
 <style>
     .ai-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                 padding: 20px; border-radius: 10px; color: white; }
-    .metric-card { background: #f0f2f6; padding: 15px; border-radius: 8px; }
+                 padding: 28px; border-radius: 12px; color: white; box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+    .metric-card { background: linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%); padding: 18px; border-radius: 12px; box-shadow: 0 6px 18px rgba(102,126,234,0.08); }
+    .hero { padding: 18px; border-radius: 12px; color: white; margin-bottom: 10px; }
+    .product-card { background: #ffffff; padding: 12px; border-radius: 10px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); text-align:center; }
+    .product-title { font-weight:700; margin-top:8px; }
+    .small-muted { color:#6b6f76; font-size:12px }
+    .kpi-row > div { padding: 8px }
 </style>
 """, unsafe_allow_html=True)
 
@@ -44,31 +63,11 @@ def load_models():
 def generate_sample_data():
     """Generate realistic TrendAnalyzer sample data"""
     np.random.seed(42)
-    
-    products = {
-        "Product": ["Laptop", "Mouse", "Keyboard", "Monitor", "Headphones", 
-                   "Webcam", "Mousepad", "USB Hub", "Desk Lamp", "Phone Stand"],
-        "Category": ["Electronics", "Accessories", "Accessories", "Electronics", "Electronics",
-                    "Accessories", "Accessories", "Accessories", "Office", "Accessories"],
-        "Price": [999, 29, 79, 299, 149, 89, 15, 35, 45, 19],
-        "Stock": [5, 15, 8, 3, 12, 20, 30, 25, 18, 40],
-        "Rating": [4.8, 4.2, 4.5, 4.7, 4.6, 4.3, 4.1, 4.4, 4.5, 4.2],
-        "Reviews": [245, 89, 120, 156, 198, 76, 92, 108, 145, 234]
-    }
-    
-    # Historical sales data
-    dates = pd.date_range(start='2024-01-01', periods=365, freq='D')
-    sales_data = []
-    for _ in range(365):
-        for product in products["Product"]:
-            sales_data.append({
-                "Date": np.random.choice(dates),
-                "Product": product,
-                "Units_Sold": np.random.randint(1, 20),
-                "Revenue": np.random.randint(100, 10000)
-            })
-    
-    return pd.DataFrame(products), pd.DataFrame(sales_data)
+    products_df = DataGenerator.generate_products(10)
+    customers_df = DataGenerator.generate_customer_segments(500)
+    sales_df = DataGenerator.generate_sales_history(products_df, customers_df, days=365)
+    reviews_df = DataGenerator.generate_customer_reviews(products_df, customers_df, n_reviews=200)
+    return products_df, customers_df, sales_df, reviews_df
 
 @st.cache_data
 def predict_product_demand(product_name, historical_data):
@@ -113,7 +112,28 @@ def analyze_sentiment(text):
 
 # Load data
 models = load_models()
-products_df, sales_df = generate_sample_data()
+
+# Load data: prefer DB if available, else generate and persist
+DB_FILE = "trendanalyzer.db"
+if os.path.exists(DB_FILE):
+    products_df = load_products(DB_FILE)
+    customers_df = load_customers(DB_FILE)
+    sales_df = load_sales(DB_FILE)
+    reviews_df = load_reviews(DB_FILE)
+    if any(df is None or df.empty for df in [products_df, customers_df, sales_df, reviews_df]):
+        products_df, customers_df, sales_df, reviews_df = generate_sample_data()
+        init_db(DB_FILE)
+        save_products(products_df, DB_FILE)
+        save_customers(customers_df, DB_FILE)
+        save_sales(sales_df, DB_FILE)
+        save_reviews(reviews_df, DB_FILE)
+else:
+    products_df, customers_df, sales_df, reviews_df = generate_sample_data()
+    init_db(DB_FILE)
+    save_products(products_df, DB_FILE)
+    save_customers(customers_df, DB_FILE)
+    save_sales(sales_df, DB_FILE)
+    save_reviews(reviews_df, DB_FILE)
 
 # ============== SIDEBAR NAVIGATION ==============
 with st.sidebar:
@@ -124,6 +144,7 @@ with st.sidebar:
         "🛍️ Smart Products",
         "🎯 AI Recommendations",
         "📊 Sales Analytics",
+        "👥 Customer Segmentation",
         "💬 Sentiment Analysis",
         "🔮 Price Prediction",
         "📈 Demand Forecast",
@@ -135,15 +156,34 @@ with st.sidebar:
 if page == "🏠 Home":
     st.markdown("<div class='ai-header'><h1>🔍 TrendAnalyzer - Analytics Dashboard</h1></div>", unsafe_allow_html=True)
     
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
+    st.markdown('<div class="ai-header"><h1 style="margin:0">🔍 TrendAnalyzer</h1><p style="margin:0.2rem 0 0.6rem 0; opacity:0.95">AI-powered analytics • Demand forecasting • Price optimization</p></div>', unsafe_allow_html=True)
+
+    # KPI cards
+    st.markdown('<div class="kpi-row">', unsafe_allow_html=True)
+    k1, k2, k3, k4 = st.columns(4)
+    with k1:
+        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
         st.metric("Total Products", len(products_df), "🛍️")
-    with col2:
+        st.markdown('</div>', unsafe_allow_html=True)
+    with k2:
+        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
         st.metric("Avg Rating", f"{products_df['Rating'].mean():.1f}/5", "⭐")
-    with col3:
+        st.markdown('</div>', unsafe_allow_html=True)
+    with k3:
+        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
         st.metric("Total Inventory", products_df['Stock'].sum(), "📦")
-    with col4:
-        st.metric("Revenue (7d)", f"${sales_df['Revenue'].sum()/50:,.0f}", "💰")
+        st.markdown('</div>', unsafe_allow_html=True)
+    with k4:
+        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+        st.metric("Customer Count", len(customers_df), "👥")
+        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('---')
+    st.subheader('📌 Customer Insights')
+    segment_counts = customers_df['Segment'].value_counts().to_dict()
+    st.write('**Customer segments:**', segment_counts)
+    st.write(f'**Average Customer Lifetime Value:** ${customers_df['Lifetime_Value'].mean():,.0f}')
     
     st.markdown("---")
     st.subheader("✨ AI-Powered Features")
@@ -184,27 +224,31 @@ elif page == "🛍️ Smart Products":
     elif sort_by == "Reviews":
         filtered_df = filtered_df.sort_values('Reviews', ascending=False)
     
-    # Display products with AI insights
-    for idx, product in filtered_df.iterrows():
-        col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
-        
-        with col1:
-            st.markdown(f"**{product['Product']}**")
-            st.caption(f"Category: {product['Category']}")
-        
-        with col2:
-            st.metric("Price", f"${product['Price']}", "💵")
-        
-        with col3:
-            st.metric("Rating", f"{product['Rating']}/5", "⭐")
-        
-        with col4:
-            if product['Stock'] > 5:
-                st.success(f"✅ {product['Stock']} in stock")
-            elif product['Stock'] > 0:
-                st.warning(f"⚠️ {product['Stock']} left")
-            else:
-                st.error("❌ Out of stock")
+    # Display products as attractive cards in a responsive grid
+    if filtered_df.empty:
+        st.info("No products found")
+    else:
+        for i in range(0, len(filtered_df), 3):
+            cols = st.columns(3, gap='large')
+            batch = filtered_df.iloc[i:i+3]
+            for col_idx in range(3):
+                with cols[col_idx]:
+                    if col_idx < len(batch):
+                        product = batch.iloc[col_idx]
+                        img_url = f"https://via.placeholder.com/320x180.png?text={product['Product'].replace(' ', '+')}"
+                        st.markdown('<div class="product-card">', unsafe_allow_html=True)
+                        st.image(img_url, use_column_width=True)
+                        st.markdown(f"<div class=\"product-title\">{product['Product']}</div>", unsafe_allow_html=True)
+                        st.markdown(f"<div class=\"small-muted\">{product['Category']} • Supplier: {product.get('Supplier', 'N/A')}</div>", unsafe_allow_html=True)
+                        st.write(f"Price: ${product['Price']}  |  Rating: {product['Rating']}/5")
+                        if product['Stock'] > 5:
+                            st.success(f"{product['Stock']} in stock")
+                        elif product['Stock'] > 0:
+                            st.warning(f"{product['Stock']} left")
+                        else:
+                            st.error("Out of stock")
+                        st.button("Add to Cart", key=f"add_{i}_{col_idx}")
+                        st.markdown('</div>', unsafe_allow_html=True)
 
 # ============== AI RECOMMENDATIONS ==============
 elif page == "🎯 AI Recommendations":
@@ -237,7 +281,7 @@ elif page == "🎯 AI Recommendations":
 elif page == "📊 Sales Analytics":
     st.subheader("📊 AI-Powered Sales Analytics")
     
-    tab1, tab2, tab3 = st.tabs(["Revenue Trend", "Product Performance", "Category Analysis"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Revenue Trend", "Product Performance", "Category Analysis", "Channel Distribution"])
     
     with tab1:
         daily_revenue = sales_df.groupby('Date')['Revenue'].sum().sort_index().tail(30)
@@ -269,6 +313,17 @@ elif page == "📊 Sales Analytics":
             title="Sales Distribution by Category"
         )
         st.plotly_chart(fig, width='stretch')
+    
+    with tab4:
+        channel_sales = sales_df.groupby('Channel')['Revenue'].sum().sort_values(ascending=False)
+        fig = px.bar(
+            x=channel_sales.values,
+            y=channel_sales.index,
+            orientation='h',
+            title="Revenue by Sales Channel",
+            labels={"x": "Revenue ($)", "y": "Channel"}
+        )
+        st.plotly_chart(fig, width='stretch')
 
 # ============== SENTIMENT ANALYSIS ==============
 elif page == "💬 Sentiment Analysis":
@@ -278,39 +333,33 @@ elif page == "💬 Sentiment Analysis":
     with col1:
         product = st.selectbox("Select product for review analysis:", products_df['Product'].values)
     with col2:
-        st.write("")
-        st.metric("Total Reviews", products_df[products_df['Product'] == product]['Reviews'].values[0])
-    
-    # Sample reviews
-    sample_reviews = [
-        "Amazing product! Works perfectly and arrived quickly.",
-        "Good quality but a bit pricey compared to competitors.",
-        "Not as expected. Poor quality and slow delivery.",
-        "Excellent customer service and great product!",
-        "Average product, nothing special about it."
-    ]
+        filtered_reviews = reviews_df[reviews_df['Product'] == product]
+        st.metric("Total Reviews", len(filtered_reviews))
+        st.metric("Avg Review Rating", f"{filtered_reviews['Rating'].mean():.1f}/5" if len(filtered_reviews) else "N/A")
     
     st.markdown("### Recent Reviews & Sentiment Analysis")
     
-    sentiments_data = []
-    for review in sample_reviews:
-        sentiment, score = analyze_sentiment(review)
-        sentiments_data.append({"Sentiment": sentiment, "Score": score})
-        
-        col1, col2 = st.columns([4, 1])
-        with col1:
-            st.write(f"💭 {review}")
-        with col2:
-            st.write(f"{sentiment}")
-    
-    # Sentiment distribution
-    df_sentiments = pd.DataFrame(sentiments_data)
-    fig = px.histogram(
-        x=df_sentiments['Sentiment'],
-        title="Sentiment Distribution",
-        labels={"x": "Sentiment", "count": "Count"}
-    )
-    st.plotly_chart(fig, width='stretch')
+    if len(filtered_reviews) == 0:
+        st.warning("No reviews found for this product yet.")
+    else:
+        sentiments_data = []
+        recent_reviews = filtered_reviews.sort_values('Date', ascending=False).head(10)
+        for _, row in recent_reviews.iterrows():
+            sentiment, score = analyze_sentiment(row['Review'])
+            sentiments_data.append({"Sentiment": sentiment, "Score": score})
+            col1, col2 = st.columns([4, 1])
+            with col1:
+                st.write(f"💭 {row['Review']}")
+            with col2:
+                st.write(f"{sentiment}")
+
+        df_sentiments = pd.DataFrame(sentiments_data)
+        fig = px.histogram(
+            x=df_sentiments['Sentiment'],
+            title="Sentiment Distribution",
+            labels={"x": "Sentiment", "count": "Count"}
+        )
+        st.plotly_chart(fig, width='stretch')
 
 # ============== PRICE PREDICTION ==============
 elif page == "🔮 Price Prediction":
@@ -355,6 +404,31 @@ elif page == "🔮 Price Prediction":
     )
     st.plotly_chart(fig, width='stretch')
 
+# ============== CUSTOMER SEGMENTATION ==============
+elif page == "👥 Customer Segmentation":
+    st.subheader("👥 Customer Segmentation & Insights")
+
+    # Segment counts
+    seg_counts = customers_df['Segment'].value_counts()
+    fig_seg = px.pie(values=seg_counts.values, names=seg_counts.index, title="Customer Segments")
+    st.plotly_chart(fig_seg, use_container_width=True)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("### Lifetime Value Distribution")
+        fig_ltv = px.histogram(customers_df, x='Lifetime_Value', nbins=30, title='Lifetime Value (CLV)')
+        st.plotly_chart(fig_ltv, use_container_width=True)
+
+    with col2:
+        st.markdown("### Churn Risk by Segment")
+        fig_churn = px.box(customers_df, x='Segment', y='Churn_Risk', points='outliers', title='Churn Risk Distribution')
+        st.plotly_chart(fig_churn, use_container_width=True)
+
+    st.markdown("---")
+    st.markdown("### Top Customers by Lifetime Value")
+    top_customers = customers_df.sort_values('Lifetime_Value', ascending=False).head(10)
+    st.table(top_customers[['Customer_ID', 'Segment', 'Lifetime_Value', 'Avg_Order_Value']].reset_index(drop=True))
+
 # ============== DEMAND FORECAST ==============
 elif page == "📈 Demand Forecast":
     st.subheader("📈 AI-Powered Demand Forecasting")
@@ -373,11 +447,16 @@ elif page == "📈 Demand Forecast":
     else:
         forecast = np.random.randint(5, 15, forecast_days)
     
-    # Combine historical and forecast
+    # Combine historical and forecast into a single plot-ready series
+    hist_len = min(30, len(historical_demand))
+    historical_values = historical_demand[-hist_len:]
+    historical_days = np.arange(len(historical_demand) - hist_len, len(historical_demand))
+    forecast_days_arr = np.arange(len(historical_demand), len(historical_demand) + forecast_days)
+
     all_data = pd.DataFrame({
-        'Day': np.arange(len(historical_demand) + forecast_days),
-        'Demand': np.concatenate([historical_demand[:30], forecast[:30]]),
-        'Type': ['Historical'] * min(30, len(historical_demand)) + ['Forecast'] * (30 - min(30, len(historical_demand)))
+        'Day': np.concatenate([historical_days, forecast_days_arr]),
+        'Demand': np.concatenate([historical_values, forecast]),
+        'Type': ['Historical'] * len(historical_values) + ['Forecast'] * len(forecast)
     })
     
     fig = px.line(
@@ -405,15 +484,27 @@ elif page == "💳 Checkout":
     col1, col2 = st.columns(2)
     
     with col1:
-        st.text_input("Full Name")
-        st.text_input("Email")
-        st.text_input("Address")
+        name = st.text_input("Full Name")
+        email = st.text_input("Email")
+        address = st.text_input("Address")
     
     with col2:
-        st.text_input("Card Number")
-        st.text_input("Expiry Date (MM/YY)")
-        st.text_input("CVV")
+        card_number = st.text_input("Card Number")
+        expiry = st.text_input("Expiry Date (MM/YY)")
+        cvv = st.text_input("CVV")
     
     if st.button("🎉 Complete Purchase", use_container_width=True):
+        # Create a simple guest order and persist to DB
+        import json
+        customer_id = f"GUEST_{int(datetime.now().timestamp())}"
+        order = {
+            'Customer_ID': customer_id,
+            'Order_Date': datetime.now().isoformat(),
+            'Total': 0.0,
+            'Items': json.dumps([]),
+            'Payment_Status': 'Paid',
+            'Channel': 'Web'
+        }
+        oid = save_order(order)
         st.balloons()
-        st.success("✅ Thank you for your purchase! Your order has been confirmed.")
+        st.success(f"✅ Thank you for your purchase! Order ID: {oid}")

@@ -1,7 +1,8 @@
 """
 Data module for TrendAnalyzer
 Handles sample data generation, processing, and analytics calculations
-""
+"""
+
 
 import pandas as pd
 import numpy as np
@@ -21,50 +22,58 @@ class DataGenerator:
         product_names = [
             "Laptop", "Mouse", "Keyboard", "Monitor", "Headphones",
             "Webcam", "Mousepad", "USB Hub", "Desk Lamp", "Phone Stand",
-            "Keyboard", "External SSD", "Webcam Tripod", "Monitor Stand", "Charging Station"
+            "External SSD", "Webcam Tripod", "Monitor Stand", "Charging Station", "Wireless Charger"
         ]
+        suppliers = ["Supplier A", "Supplier B", "Supplier C", "Supplier D", "Supplier E"]
         
         for i in range(min(n_products, len(product_names))):
+            price = round(np.random.uniform(15, 1000), 2)
+            cost = round(price * np.random.uniform(0.4, 0.7), 2)
             products.append({
                 "Product": product_names[i],
                 "Category": categories[i % len(categories)],
-                "Price": np.random.randint(15, 1000),
-                "Stock": np.random.randint(1, 50),
+                "Price": price,
+                "Stock": np.random.randint(5, 100),
                 "Rating": round(np.random.uniform(3.5, 5.0), 1),
-                "Reviews": np.random.randint(10, 500),
-                "Cost": np.random.randint(5, 400),
-                "Supplier": f"Supplier_{i % 5 + 1}"
+                "Reviews": np.random.randint(20, 1000),
+                "Cost": cost,
+                "Supplier": suppliers[i % len(suppliers)],
+                "Reorder_Level": np.random.randint(10, 30)
             })
         
         return pd.DataFrame(products)
     
     @staticmethod
-    def generate_sales_history(products_df, days=365):
-        """Generate historical sales data"""
+    def generate_sales_history(products_df, customers_df, days=365):
+        """Generate historical sales data with channels and customers"""
         sales = []
         dates = pd.date_range(start=datetime.now() - timedelta(days=days), 
                              end=datetime.now(), 
                              freq='D')
+        channels = ["Web", "App", "WhatsApp", "Call Center"]
         
         for date in dates:
             for _, product in products_df.iterrows():
-                if np.random.random() > 0.3:  # 70% chance of sale
+                if np.random.random() > 0.4:  # 60% chance of sale
+                    customer = customers_df.sample(1).iloc[0]
+                    units = np.random.randint(1, 15)
+                    unit_price = round(product['Price'] * np.random.uniform(0.9, 1.2), 2)
                     sales.append({
                         "Date": date,
                         "Product": product['Product'],
-                        "Category": product['Category'],
-                        "Units_Sold": np.random.randint(1, 15),
-                        "Unit_Price": product['Price'],
-                        "Revenue": 0  # Will be calculated
+                        "Customer_ID": customer['Customer_ID'],
+                        "Channel": np.random.choice(channels, p=[0.35, 0.3, 0.2, 0.15]),
+                        "Units_Sold": units,
+                        "Unit_Price": unit_price,
+                        "Revenue": round(units * unit_price, 2)
                     })
         
         sales_df = pd.DataFrame(sales)
-        sales_df['Revenue'] = sales_df['Units_Sold'] * sales_df['Unit_Price']
         return sales_df
     
     @staticmethod
-    def generate_customer_reviews(products_df, n_reviews=100):
-        """Generate sample customer reviews"""
+    def generate_customer_reviews(products_df, customers_df, n_reviews=200):
+        """Generate sample customer reviews linked to customers"""
         sample_reviews = [
             "Amazing product! Exactly what I needed. Fast shipping!",
             "Great quality and good price. Highly recommend!",
@@ -80,8 +89,10 @@ class DataGenerator:
         
         reviews = []
         for _ in range(n_reviews):
+            customer = customers_df.sample(1).iloc[0]
             reviews.append({
                 "Product": np.random.choice(products_df['Product'].values),
+                "Customer_ID": customer['Customer_ID'],
                 "Rating": np.random.randint(1, 6),
                 "Review": np.random.choice(sample_reviews),
                 "Date": datetime.now() - timedelta(days=np.random.randint(1, 365))

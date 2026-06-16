@@ -91,10 +91,17 @@ TrendAnalyzer/
 ### Running Locally
 
 ```bash
-streamlit run app.py
+python -m pip install -r requirements.txt
+python -m streamlit run app.py
 ```
 
 The app will open at `http://localhost:8501`
+
+Optional: initialize local SQLite DB with sample data (creates `trendanalyzer.db`):
+
+```bash
+python init_db.py
+```
 
 ## 📚 Machine Learning Models Used
 
