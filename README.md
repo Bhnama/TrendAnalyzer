@@ -1,4 +1,4 @@
-# 🔍 TrendAnalyzer - AI-Powered E-Commerce Analytics
+# 🔍 TrendAnalyzer - AI-Powered Analytics Platform
 
 A cutting-edge analytics platform powered by Machine Learning and Artificial Intelligence, built with Streamlit for interactive trend analysis, demand forecasting, and predictive insights.
 
@@ -146,7 +146,7 @@ The platform includes generated sample data for demonstration:
 1. **Push to GitHub:**
    ```bash
    git add .
-   git commit -m "Enhanced: AI/ML-powered e-commerce platform"
+   git commit -m "Enhanced: AI/ML-powered TrendAnalyzer"
    git push origin main
    ```
 
@@ -177,7 +177,7 @@ The platform includes generated sample data for demonstration:
 
 ## 💡 Use Cases
 
-### For E-Commerce Businesses
+### For Analytics & Retail Businesses
 - **Recommendation System**: Increase cross-sell and upsell opportunities
 - **Price Optimization**: Maximize revenue with dynamic pricing
 - **Demand Planning**: Optimize inventory management

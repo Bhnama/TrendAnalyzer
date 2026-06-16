@@ -28,7 +28,7 @@ ORDER BY total_revenue DESC;
 -- Objective: Measure channel contribution to prioritize marketing spend and automation.
 -- --------------------------------------------------------------------
 -- Business Insight: Self-serve direct digital channels (App and WhatsApp) represent
--- over 68% of total e-commerce revenue. Web holds steady for high-ticket entries,
+-- over 68% of total TrendAnalyzer revenue impact. Web holds steady for high-ticket entries,
 -- while Helpline is heavily underutilized.
 -- --------------------------------------------------------------------
 

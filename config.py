@@ -157,7 +157,7 @@ EMAIL_CONFIG = {
     "smtp_server": "smtp.gmail.com",
     "smtp_port": 587,
     "use_tls": True,
-    "from_email": "notifications@ecommerce.ai"
+    "from_email": "notifications@trendanalyzer.ai"
 }
 
 # API Configuration (for future integrations)

@@ -10,7 +10,7 @@ import json
 
 
 class DataGenerator:
-    """Generate realistic e-commerce data for demonstration"""
+    """Generate realistic TrendAnalyzer sample data for demonstration"""
     
     @staticmethod
     def generate_products(n_products=10):
@@ -111,7 +111,7 @@ class DataGenerator:
 
 
 class DataProcessor:
-    """Process and transform e-commerce data"""
+    """Process and transform TrendAnalyzer data"""
     
     @staticmethod
     def calculate_kpis(sales_df, products_df):

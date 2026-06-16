@@ -1,6 +1,6 @@
 -- TrendAnalyzer: Analytics Database Schema Creation (DDL)
 -- Target Database: SQLite / MySQL / PostgreSQL Compatible
--- Perfectly aligned with the Coding Ninjas E-Commerce Case Study.
+-- Perfectly aligned with the Coding Ninjas Analytics Case Study.
 
 -- 1. Customers Table
 -- Stores unified profiles across 14 countries

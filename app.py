@@ -42,7 +42,7 @@ def load_models():
 
 @st.cache_data
 def generate_sample_data():
-    """Generate realistic e-commerce data"""
+    """Generate realistic TrendAnalyzer sample data"""
     np.random.seed(42)
     
     products = {
