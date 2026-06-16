@@ -1,5 +1,5 @@
 -- ====================================================================
--- E-COMMERCE RETAIL ANALYTICS CASE STUDY: SOLVED BUSINESS PROBLEMS
+-- TRENDANALYZER: ANALYTICS INSIGHTS & BUSINESS INTELLIGENCE QUERIES
 -- Developed for Coding Ninjas Data Analytics Capstone
 -- ====================================================================
 

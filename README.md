@@ -1,6 +1,6 @@
-# 🤖 AI-Powered E-Commerce Platform
+# 🔍 TrendAnalyzer - AI-Powered E-Commerce Analytics
 
-A cutting-edge e-commerce platform powered by Machine Learning and Artificial Intelligence, built with Streamlit for interactive data visualization and predictive analytics.
+A cutting-edge analytics platform powered by Machine Learning and Artificial Intelligence, built with Streamlit for interactive trend analysis, demand forecasting, and predictive insights.
 
 ## ✨ AI/ML Features
 
@@ -42,7 +42,7 @@ A cutting-edge e-commerce platform powered by Machine Learning and Artificial In
 ## 📦 Project Structure
 
 ```
-E-Commerce-Project/
+TrendAnalyzer/
 ├── app.py                 # 🎯 Main Streamlit app (AI/ML features)
 ├── ml_utils.py           # 🤖 Machine Learning utilities
 │   ├── ProductRecommendationEngine
@@ -73,8 +73,8 @@ E-Commerce-Project/
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Bhnama/E--COMMERCE-COMPANY.git
-   cd E--COMMERCE-COMPANY
+   git clone https://github.com/Bhnama/TrendAnalyzer.git
+   cd TrendAnalyzer
    ```
 
 2. **Create virtual environment (optional but recommended):**
@@ -153,7 +153,7 @@ The platform includes generated sample data for demonstration:
 2. **Deploy on Streamlit Cloud:**
    - Go to [streamlit.io](https://streamlit.io)
    - Click "New app"
-   - Select repository: `Bhnama/E--COMMERCE-COMPANY`
+   - Select repository: `Bhnama/TrendAnalyzer`
    - Select branch: `main`
    - Set main file: `app.py`
    - Click "Deploy"
@@ -234,14 +234,14 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 **Bhnama**  
 GitHub: [@Bhnama](https://github.com/Bhnama)  
-E-Commerce Project: [E--COMMERCE-COMPANY](https://github.com/Bhnama/E--COMMERCE-COMPANY)
+Project: [TrendAnalyzer](https://github.com/Bhnama/TrendAnalyzer)
 
 ## 🆘 Support
 
 - 📖 [Streamlit Documentation](https://docs.streamlit.io)
 - 🤖 [Scikit-Learn Documentation](https://scikit-learn.org)
 - 📊 [Plotly Documentation](https://plotly.com/python)
-- 💬 [GitHub Issues](https://github.com/Bhnama/E--COMMERCE-COMPANY/issues)
+- 💬 [GitHub Issues](https://github.com/Bhnama/TrendAnalyzer/issues)
 
 ## 📊 Performance Metrics
 

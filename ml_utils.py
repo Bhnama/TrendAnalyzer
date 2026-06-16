@@ -1,6 +1,6 @@
 """
-Machine Learning Utilities for E-Commerce Platform
-Includes recommendation engine, price prediction, demand forecasting, and sentiment analysis
+Machine Learning Utilities for TrendAnalyzer
+Includes product recommendations, price prediction, demand forecasting, sentiment analysis, and churn prediction
 """
 
 import numpy as np

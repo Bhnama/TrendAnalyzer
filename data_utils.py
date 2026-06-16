@@ -1,7 +1,7 @@
 """
-Data module for E-Commerce AI Platform
-Handles data generation, processing, and storage
-"""
+Data module for TrendAnalyzer
+Handles sample data generation, processing, and analytics calculations
+""
 
 import pandas as pd
 import numpy as np

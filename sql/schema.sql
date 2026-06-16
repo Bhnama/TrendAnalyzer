@@ -1,4 +1,4 @@
--- E-Commerce Retail Analytics: Database Schema Creation (DDL)
+-- TrendAnalyzer: Analytics Database Schema Creation (DDL)
 -- Target Database: SQLite / MySQL / PostgreSQL Compatible
 -- Perfectly aligned with the Coding Ninjas E-Commerce Case Study.
 

@@ -1,10 +1,10 @@
 """
-Configuration settings for the AI E-Commerce Platform
+Configuration settings for TrendAnalyzer - Analytics Platform
 """
 
 # App Configuration
-APP_NAME = "🤖 AI-Powered E-Commerce Platform"
-APP_DESCRIPTION = "Next-generation e-commerce platform with machine learning and AI capabilities"
+APP_NAME = "🔍 TrendAnalyzer"
+APP_DESCRIPTION = "AI-powered analytics platform with demand forecasting, price optimization, and predictive insights"
 APP_VERSION = "2.0"
 
 # Streamlit Configuration

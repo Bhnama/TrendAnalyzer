@@ -15,7 +15,7 @@ warnings.filterwarnings("ignore")
 
 # Page configuration
 st.set_page_config(
-    page_title="🤖 AI E-Commerce Platform", 
+    page_title="🔍 TrendAnalyzer - Analytics Dashboard", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -117,7 +117,7 @@ products_df, sales_df = generate_sample_data()
 
 # ============== SIDEBAR NAVIGATION ==============
 with st.sidebar:
-    st.markdown("### 🤖 AI E-Commerce Platform")
+    st.markdown("### 🔍 TrendAnalyzer Analytics")
     st.markdown("---")
     page = st.radio("Select Page:", [
         "🏠 Home",
@@ -133,7 +133,7 @@ with st.sidebar:
 
 # ============== HOME PAGE ==============
 if page == "🏠 Home":
-    st.markdown("<div class='ai-header'><h1>🤖 AI-Powered E-Commerce Platform</h1></div>", unsafe_allow_html=True)
+    st.markdown("<div class='ai-header'><h1>🔍 TrendAnalyzer - Analytics Dashboard</h1></div>", unsafe_allow_html=True)
     
     col1, col2, col3, col4 = st.columns(4)
     with col1:
